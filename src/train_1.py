@@ -13,19 +13,17 @@ def run():
 
     # Check if preprocessed data exists
     if not all((processed_path / f).exists() for f in ["processed_train.csv", "processed_test.csv", "processed_val.csv"]):
-        print("❌ Preprocessed data not found! Please run the preprocessing script first.")
+        print("Preprocessed data not found! Please run the preprocessing script first.")
         exit()
 
-    print("✅ Preprocessed data found. Proceeding with model training and hyperparameter tuning...")
+    print("Preprocessed data found. Proceeding with model training and hyperparameter tuning...\n")
 
     # Load preprocessed data
     train_df = pd.read_csv(processed_path / "processed_train.csv")
-    test_df = pd.read_csv(processed_path / "processed_test.csv")
     val_df = pd.read_csv(processed_path / "processed_val.csv")
 
     # Split into features (X) and target (y)
     X_train, y_train = train_df.drop("Churn", axis=1), train_df["Churn"]
-    X_test, y_test = test_df.drop("Churn", axis=1), test_df["Churn"]
     X_val, y_val = val_df.drop("Churn", axis=1), val_df["Churn"]
 
     # Define hyperparameter grid
@@ -43,21 +41,20 @@ def run():
 
     # Get best model from tuning
     best_rf_model = random_search.best_estimator_
-    print("✅ Best model hyperparameters:", random_search.best_params_)
+    print("Best model hyperparameters:", random_search.best_params_, "\n")
 
     # Predictions
-    y_pred_test = best_rf_model.predict(X_test)
     y_pred_val = best_rf_model.predict(X_val)
 
     # Evaluate model
-    print("Test Set Evaluation:")
-    print(f"Accuracy: {accuracy_score(y_test, y_pred_test):.4f}")
-    print(f"Precision: {precision_score(y_test, y_pred_test):.4f}")
-    print(f"Recall: {recall_score(y_test, y_pred_test):.4f}")
-    print(f"F1 Score: {f1_score(y_test, y_pred_test):.4f}")
+    print("Validation Set Evaluation:")
+    print(f"Accuracy: {accuracy_score(y_val, y_pred_val):.4f}")
+    print(f"Precision: {precision_score(y_val, y_pred_val):.4f}")
+    print(f"Recall: {recall_score(y_val, y_pred_val):.4f}")
+    print(f"F1 Score: {f1_score(y_val, y_pred_val):.4f}\n")
     print("Confusion Matrix:")
-    print(confusion_matrix(y_test, y_pred_test))
+    print(confusion_matrix(y_val, y_pred_val), "\n")
 
     # Save best model
     joblib.dump(best_rf_model, models_path / "random_forest_model.pkl")
-    print("✅ Best model trained and saved as 'random_forest_model.pkl'")
+    print("Best model trained and saved as 'random_forest_model.pkl.'")
