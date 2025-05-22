@@ -2,6 +2,9 @@ import pandas as pd
 import joblib
 from pathlib import Path
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 def run():
     root_path = Path(__file__).resolve().parents[1]
@@ -31,6 +34,30 @@ def run():
     print(f"F1 Score:  {f1_score(actual_churn, predictions):.4f}\n")
     print("Confusion Matrix:")
     print(confusion_matrix(actual_churn, predictions), "\n")
+
+    # For plotting
+    accuracy = accuracy_score(actual_churn, predictions)
+    precision = precision_score(actual_churn, predictions)
+    recall = recall_score(actual_churn, predictions)
+    f1 = f1_score(actual_churn, predictions)
+
+    # Metrics dictionary
+    metrics = {
+        'Accuracy': accuracy,
+        'Precision': precision,
+        'Recall': recall,
+        'F1 Score': f1
+    }
+
+    # Plot
+    plt.figure(figsize=(8, 6))
+    sns.barplot(x=list(metrics.keys()), y=list(metrics.values()), palette="viridis")
+    plt.ylim(0, 1)
+    plt.title("Model Evaluation Metrics")
+    plt.ylabel("Score")
+    plt.grid(axis='y')
+    plt.tight_layout()
+    plt.show()
 
     # Insert back actual churn and save predictions
     X_test["Churn"] = actual_churn
